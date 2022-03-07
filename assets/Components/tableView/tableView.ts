@@ -471,6 +471,7 @@ export default class tableView extends cc.ScrollView {
     //===========================================================================================对scrollView方法的重写
 
     scrollToLeft(timeInSecond?: number, attenuated?: boolean) {
+        this.stopAutoScroll();
         if (timeInSecond) {
             this._updateCellsOn = true;
         } else {
@@ -480,6 +481,7 @@ export default class tableView extends cc.ScrollView {
     }
 
     scrollToRight(timeInSecond?: number, attenuated?: boolean) {
+        this.stopAutoScroll();
         if (timeInSecond) {
             this._updateCellsOn = true;
         } else {
@@ -489,6 +491,7 @@ export default class tableView extends cc.ScrollView {
     }
 
     scrollToTop(timeInSecond?: number, attenuated?: boolean) {
+        this.stopAutoScroll();
         if (timeInSecond) {
             this._updateCellsOn = true;
         } else {
@@ -498,6 +501,7 @@ export default class tableView extends cc.ScrollView {
     }
 
     scrollToBottom(timeInSecond?: number, attenuated?: boolean) {
+        this.stopAutoScroll();
         if (timeInSecond) {
             this._updateCellsOn = true;
         } else {
