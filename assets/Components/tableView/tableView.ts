@@ -475,6 +475,9 @@ export default class tableView extends cc.ScrollView {
      * @param attenuated 滚动加速是否衰减，默认为 true。
      */
     scrollToTargetIndex(index: number, timeInSecond?: number, attenuated?: boolean){
+        if(this._cellData == null){
+            return;
+        }
         let totalLen = this._cellData.length;
         let percent = 1;
         let targetSize = 0;
@@ -484,54 +487,25 @@ export default class tableView extends cc.ScrollView {
         } else if (this._ScrollModel == ScrollModel.Vertical) {
             targetSize = this.node.height;
         }
+        
+        let viewIndex = targetSize/this._cellSize;
+        let halfViewIndex = viewIndex/2;
+        let uIndex = index - halfViewIndex + 0.5;
+        let bIndex = totalLen - uIndex - viewIndex;
 
-        if(index * this._cellSize*2 <= targetSize){
-            percent = 1;
-        }else if((totalLen - index) * this._cellSize*2 <= targetSize){
-            percent = 0;
-        }else{
-            /**
-             * X1: 顶部不可见区域 
-             * X2: 底部不可见区域
-             * L1: 整个content的长度
-             * L2: 可视区域view的长度
-             * L3: 可视区域view的长度的一半 L2/2
-             * I: 底部不可见区域的长度+view长度一半 与 顶部不可见区域的长度+view长度一半 之比也是 需要展示的index为分界点 后面总数与前面总数之比。
-             * +0.5表示数据居中放置
-             * 
-             * cIndex = index + 0.5;
-             * I = (totalLen-cIndex)/cIndex;
-             * 
-             * 一式： (X2+L3)/(X1+L3) = I;
-             * 二式： X1+X2 = L1-L2;
-             * 由一二式得：X2 = (I*(L1-L2+L3)-L3) / (I+1);
-             * 最终 目标滚动的比例为：
-             * percent = X2/(L1 - L2);
-             */
-
-            //通过序号算出 底部不可见区域的长度+view长度一半 与 顶部不可见区域的长度+view长度一半 之比
-            let cIndex = index + 0.5;
-            let percent1 = (totalLen-cIndex)/cIndex;
-            //
-            let maxSize = this._cellSize * totalLen;
-            let halfTargetSize = targetSize/2;
-            let bottomSize = (percent1*(maxSize - targetSize + halfTargetSize) - halfTargetSize)/(1+percent1);
-            let upSize = maxSize - targetSize - bottomSize;
-            
-            if (this._ScrollModel == ScrollModel.Horizontal) {
-                percent = upSize/(maxSize - targetSize);
-            } else if (this._ScrollModel == ScrollModel.Vertical) {
-                percent = bottomSize/(maxSize - targetSize);
-            }
-            
-            // percent = (totalLen-index)/totalLen;
-            percent = percent < 0 ? 0 : percent;
-            percent = percent > 1 ? 1 : percent;
+        if (this._ScrollModel == ScrollModel.Horizontal) {
+            //传入的百分比是  =  左边不可见区域的长度/(content长度-view长度)
+            percent = uIndex/(totalLen - viewIndex);
+        } else if (this._ScrollModel == ScrollModel.Vertical) {
+            //传入的百分比是  =  底部不可见区域的长度/(content长度-view长度)
+            percent = bIndex/(totalLen - viewIndex);
         }
+        
+        percent = percent < 0 ? 0 : percent;
+        percent = percent > 1 ? 1 : percent;
 
         console.log("percent = ", percent);
         
-        //传入的百分比是  =  底部不可见区域的长度/(content长度-view长度)
         if (this._ScrollModel == ScrollModel.Horizontal) {
             this.scrollToPercentHorizontal(percent, timeInSecond, attenuated);
         } else if (this._ScrollModel == ScrollModel.Vertical) {
