@@ -277,7 +277,7 @@ export default class TableView extends ScrollView {
             trans.setContentSize(new Size(trans.contentSize.width, contentSize));
             this._contentTopY = contentSize / 2;
 
-            this._pagePercent = tbTrans.height/(contentSize - tbTrans.width);
+            this._pagePercent = tbTrans.height/(contentSize - tbTrans.height);
         }
         if(this._pagePercent > 1){
             this._pagePercent = 1;
@@ -593,7 +593,7 @@ export default class TableView extends ScrollView {
                 return;
             }
             //传入的百分比是  =  底部不可见区域的长度/(content长度-view长度)
-            percent = (trans.height - tbTrans.height - Math.abs(scrollLen.y))/(trans.height - tbTrans.height) + this._pagePercent;
+            percent = (trans.height - tbTrans.height - Math.abs(scrollLen.y))/(trans.height - tbTrans.height) - this._pagePercent;
         }
 
         percent = percent < 0 ? 0 : percent;
@@ -633,7 +633,7 @@ export default class TableView extends ScrollView {
                 return;
             }
              //传入的百分比是  =  底部不可见区域的长度/(content长度-view长度)
-             percent = (trans.height - tbTrans.height - Math.abs(scrollLen.y))/(trans.height - tbTrans.height) - this._pagePercent;
+             percent = (trans.height - tbTrans.height - Math.abs(scrollLen.y))/(trans.height - tbTrans.height) + this._pagePercent;
         }
 
         percent = percent < 0 ? 0 : percent;

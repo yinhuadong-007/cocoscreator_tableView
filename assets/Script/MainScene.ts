@@ -39,10 +39,14 @@ export class MainScene extends Component {
 
     onClickLeft(){
         this.hor_TableView.scrollToLastPage(0.2);
+
+        this.ver_TableView.scrollToLastPage(0.2);
     }
 
     onClickRight(){
         this.hor_TableView.scrollToNextPage(0.2);
+
+        this.ver_TableView.scrollToNextPage(0.2);
     }
 
 }
