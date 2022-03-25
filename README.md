@@ -24,3 +24,5 @@ tableView.init([子节点数组])
 4、scrollToBottom(timeInSecond?: number, attenuated?: boolean)   //滑动到底部
 
 5、scrollToTargetIndex(index: number, timeInSecond?: number, attenuated?: boolean)//移动到目标数据的位置 @param index 指定数据在数据数组中的下标
+
+6、scrollToNextPage（向后翻页）、scrollToLastPage（向前翻页） 支持翻页
