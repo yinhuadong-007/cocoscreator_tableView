@@ -85,6 +85,11 @@ export default class tableView extends cc.ScrollView {
     private _updateCellsOn: boolean = false;
     /**刷新一次cell */
     private _updateCellsOnce: boolean = false;
+    /**一页内容的所占整体的百分比 */
+    private _pagePercent: number;
+    public get pagePercent(): number{
+        return this._pagePercent;
+    }
     //====================================================生命周期函数
 
     onLoad() {
@@ -254,9 +259,17 @@ export default class tableView extends cc.ScrollView {
         if (this._ScrollModel == ScrollModel.Horizontal) {
             this.content.width = contentSize;
             this._contentLeftX = -this.content.width / 2;
+            
+            this._pagePercent = this.node.width/(contentSize - this.node.width);
         } else {
             this.content.height = contentSize;
             this._contentTopY = this.content.height / 2;
+            
+            this._pagePercent = this.node.height/(contentSize - this.node.height);
+        }
+        
+        if(this._pagePercent > 1){
+            this._pagePercent = 1;
         }
     }
 
@@ -501,6 +514,86 @@ export default class tableView extends cc.ScrollView {
             percent = bIndex/(totalLen - viewIndex);
         }
         
+        percent = percent < 0 ? 0 : percent;
+        percent = percent > 1 ? 1 : percent;
+
+        console.log("percent = ", percent);
+        
+        if (this._ScrollModel == ScrollModel.Horizontal) {
+            this.scrollToPercentHorizontal(percent, timeInSecond, attenuated);
+        } else if (this._ScrollModel == ScrollModel.Vertical) {
+            this.scrollToPercentVertical(percent, timeInSecond, attenuated);
+        }
+    }
+    
+    /**
+     * 向后翻页
+     * @param timeInSecond 移动时间
+     * @param attenuated 滚动加速是否衰减，默认为 true。
+     * @returns 
+     */
+    scrollToNextPage(timeInSecond?: number, attenuated?: boolean){
+        if(this._cellData == null){
+            return;
+        }
+        const scrollLen = this.getScrollOffset(); //获取滚动视图相对于左上角原点的当前滚动偏移
+        let tbTrans = this.node.getComponent(UITransform);
+        let trans = this.content.getComponent(UITransform);
+        let percent = 1;
+        if (this._ScrollModel == ScrollModel.Horizontal) {
+            if(trans.width <= tbTrans.width){
+                return;
+            }
+            //传入的百分比是  =  左边不可见区域的长度/(content长度-view长度)
+            percent = (Math.abs(scrollLen.x))/(trans.width - tbTrans.width) + this._pagePercent;
+        } else if (this._ScrollModel == ScrollModel.Vertical) {
+            if(trans.height <= tbTrans.height){
+                return;
+            }
+            //传入的百分比是  =  底部不可见区域的长度/(content长度-view长度)
+            percent = (trans.height - tbTrans.height - Math.abs(scrollLen.y))/(trans.height - tbTrans.height) - this._pagePercent;
+        }
+
+        percent = percent < 0 ? 0 : percent;
+        percent = percent > 1 ? 1 : percent;
+
+        console.log("percent = ", percent);
+        
+        if (this._ScrollModel == ScrollModel.Horizontal) {
+            this.scrollToPercentHorizontal(percent, timeInSecond, attenuated);
+        } else if (this._ScrollModel == ScrollModel.Vertical) {
+            this.scrollToPercentVertical(percent, timeInSecond, attenuated);
+        }
+    }
+
+    /**
+     * 向前翻页
+     * @param timeInSecond 移动时间
+     * @param attenuated 滚动加速是否衰减，默认为 true。
+     * @returns 
+     */
+    scrollToLastPage(timeInSecond?: number, attenuated?: boolean){
+        if(this._cellData == null){
+            return;
+        }
+        const scrollLen = this.getScrollOffset(); //获取滚动视图相对于左上角原点的当前滚动偏移
+        let tbTrans = this.node.getComponent(UITransform);
+        let trans = this.content.getComponent(UITransform);
+        let percent = 1;
+        if (this._ScrollModel == ScrollModel.Horizontal) {
+            if(trans.width <= tbTrans.width){
+                return;
+            }
+            //传入的百分比是  =  左边不可见区域的长度/(content长度-view长度)
+            percent = (Math.abs(scrollLen.x))/(trans.width - tbTrans.width) - this._pagePercent;
+        } else if (this._ScrollModel == ScrollModel.Vertical) {
+            if(trans.height <= tbTrans.height){
+                return;
+            }
+             //传入的百分比是  =  底部不可见区域的长度/(content长度-view长度)
+             percent = (trans.height - tbTrans.height - Math.abs(scrollLen.y))/(trans.height - tbTrans.height) + this._pagePercent;
+        }
+
         percent = percent < 0 ? 0 : percent;
         percent = percent > 1 ? 1 : percent;
 
